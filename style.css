@@ -26,3 +26,8 @@ body {
     width: 33%;
 }
 
+.selected {
+	stroke: black;
+	stroke-width: 1px;
+	opacity: 1 !important;
+}

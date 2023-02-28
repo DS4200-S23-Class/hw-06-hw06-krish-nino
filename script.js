@@ -95,8 +95,7 @@ window.onload = function () {
     svg2.append("g").call(d3.axisLeft(Y_SCALE_2));
 
     // Add dots to the scatterplot
-    svg2
-      .selectAll("circle")
+    svg2.selectAll("circle")
       .data(data)
       .enter()
       .append("circle")
@@ -111,6 +110,34 @@ window.onload = function () {
         return color(d.Species);
       })
       .style("opacity", 0.5);
+
+    // // Add brush
+    // let brush = d3
+    //   .brush()
+    //   .extent([
+    //     [0, 0],
+    //     [width, height],
+    //   ])
+    //   .on("start brush", updateChart);
+
+    // svg2.append("g").call(brush);
+
+    // // Function that is triggered when brushing is performed
+    // function updateChart(event) {
+    //     extent = event.selection;
+    
+    //     svg2.classed("selected", function(d){ return isBrushed(extent, X_SCALE_2(parseInt(d.Sepal_Width)) + MARGINS.left, Y_SCALE_2(parseInt(d.Petal_Width)) + MARGINS.top ) } )
+    //     }
+
+    // // A function that returns true if a dot is in the brush selection, and false otherwise
+    // function isBrushed(brush_coords, cx, cy) {
+    //   let x0 = brush_coords[0][0],
+    //     y0 = brush_coords[0][1],
+    //     x1 = brush_coords[1][0],
+    //     y1 = brush_coords[1][1];
+
+    //   return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;
+    // }
 
     // Define a function to get the count of each species
     const count_by_species = Array.from(
@@ -130,9 +157,15 @@ window.onload = function () {
       .padding(0.2);
 
     // Define a scale for the y axis of the bar chart
-    let Y_SCALE_3 = d3.scaleLinear()
-  .domain([0, d3.max(count_by_species, function(d) { return d.count; })])
-  .range([height, 0]);
+    let Y_SCALE_3 = d3
+      .scaleLinear()
+      .domain([
+        0,
+        d3.max(count_by_species, function (d) {
+          return d.count;
+        }),
+      ])
+      .range([height, 0]);
 
     // Add x axis to the bar chart
     svg3
@@ -144,14 +177,23 @@ window.onload = function () {
     svg3.append("g").call(d3.axisLeft(Y_SCALE_3));
 
     // Add bars to the bar chart
-    svg3.selectAll("rect")
-    .data(count_by_species)
-    .enter()
-    .append("rect")
-    .attr("x", function(d) { return X_SCALE_3(d.Species); })
-    .attr("y", function(d) { return Y_SCALE_3(d.count); })
-    .attr("width", X_SCALE_3.bandwidth())
-    .attr("height", function(d) { return height - Y_SCALE_3(d.count); })
-    .style("fill", function(d) { return color(d.Species); });
+    svg3
+      .selectAll("rect")
+      .data(count_by_species)
+      .enter()
+      .append("rect")
+      .attr("x", function (d) {
+        return X_SCALE_3(d.Species);
+      })
+      .attr("y", function (d) {
+        return Y_SCALE_3(d.count);
+      })
+      .attr("width", X_SCALE_3.bandwidth())
+      .attr("height", function (d) {
+        return height - Y_SCALE_3(d.count);
+      })
+      .style("fill", function (d) {
+        return color(d.Species);
+      });
   });
 };
