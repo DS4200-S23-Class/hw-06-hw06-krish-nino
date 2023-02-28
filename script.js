@@ -170,7 +170,7 @@ window.onload = function () {
       .padding(0.2);
 
     // scaling y function for bar graph
-    const Y_SCALE3 = d3.scaleLinear().domain([0, 60]).range([height, 0]);
+    const Y_SCALE3 = d3.scaleLinear().domain([0, 50]).range([height, 0]);
 
     const data2 = [
       { Species: "setosa", Amount: 50 },
