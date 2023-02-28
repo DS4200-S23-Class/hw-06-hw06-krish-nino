@@ -1,0 +1,24 @@
+/* make all font Arial */
+body {
+    font-family: Arial;
+}
+
+.centered {
+    text-align: center;
+}
+
+#col1 {
+    float: left;
+    width: 33%;
+}
+
+#col2 {
+    float: left;
+    width: 33%;
+}
+
+#col3 {
+    float: left;
+    width: 33%;
+}
+
