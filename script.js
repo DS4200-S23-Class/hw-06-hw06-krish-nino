@@ -95,7 +95,8 @@ window.onload = function () {
     svg2.append("g").call(d3.axisLeft(Y_SCALE_2));
 
     // Add dots to the scatterplot
-    svg2.selectAll("circle")
+    svg2
+      .selectAll("circle")
       .data(data)
       .enter()
       .append("circle")
@@ -111,89 +112,109 @@ window.onload = function () {
       })
       .style("opacity", 0.5);
 
-    // // Add brush
-    // let brush = d3
-    //   .brush()
-    //   .extent([
-    //     [0, 0],
-    //     [width, height],
-    //   ])
-    //   .on("start brush", updateChart);
+    // Add brush
+    let brush = d3
+      .brush()
+      .extent([
+        [0, 0],
+        [width, height],
+      ])
+      .on("start brush", updateChart);
 
-    // svg2.append("g").call(brush);
+    svg2.append("g").call(brush);
 
-    // // Function that is triggered when brushing is performed
-    // function updateChart(event) {
-    //     extent = event.selection;
-    
-    //     svg2.classed("selected", function(d){ return isBrushed(extent, X_SCALE_2(parseInt(d.Sepal_Width)) + MARGINS.left, Y_SCALE_2(parseInt(d.Petal_Width)) + MARGINS.top ) } )
-    //     }
+    // Function that is triggered when brushing is performed
+    function updateChart(event) {
+      extent = event.selection;
+      svg.classed("brushed", function (d) {
+        return isBrushed(
+          extent,
+          X_SCALE2(d.Sepal_Width) + margin.left,
+          Y_SCALE2(d.Petal_Width) + margin.top
+        );
+      });
+      svg2.classed("brushed", function (d) {
+        return isBrushed(
+          extent,
+          X_SCALE2(d.Sepal_Width) + margin.left,
+          Y_SCALE2(d.Petal_Width) + margin.top
+        );
+      });
+    bars.classed("selected", function (d) {
+        return isBrushed(
+          extent,
+          X_SCALE2(d.Sepal_Width) + margin.left,
+          Y_SCALE2(d.Petal_Width) + margin.top
+        );
+      });
+    }
 
-    // // A function that returns true if a dot is in the brush selection, and false otherwise
-    // function isBrushed(brush_coords, cx, cy) {
-    //   let x0 = brush_coords[0][0],
-    //     y0 = brush_coords[0][1],
-    //     x1 = brush_coords[1][0],
-    //     y1 = brush_coords[1][1];
+    // A function that returns true if a dot is in the brush selection, and false otherwise
+    function isBrushed(brush_coords, cx, cy) {
+        let x0 = brush_coords[0][0],
+            x1 = brush_coords[1][0],
+            y0 = brush_coords[0][1],
+            y1 = brush_coords[1][1];
+        return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;    // This return TRUE or FALSE depending on if the points is in the selected area
+    }
 
-    //   return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;
-    // }
-
-    // Define a function to get the count of each species
-    const count_by_species = Array.from(
-      d3.group(data, (d) => d.Species),
-      ([key, values]) => ({ Species: key, count: values.length })
-    );
-
-    // Define a scale for the x axis of the bar chart
-    let X_SCALE_3 = d3
+    // scaling x function for bar graph
+    const X_SCALE3 = d3
       .scaleBand()
       .domain(
-        count_by_species.map(function (d) {
-          return d.key;
+        data.map(function (d) {
+          return d.Species;
         })
       )
       .range([0, width])
       .padding(0.2);
 
-    // Define a scale for the y axis of the bar chart
-    let Y_SCALE_3 = d3
-      .scaleLinear()
-      .domain([
-        0,
-        d3.max(count_by_species, function (d) {
-          return d.count;
-        }),
-      ])
-      .range([height, 0]);
+    // scaling y function for bar graph
+    const Y_SCALE3 = d3.scaleLinear().domain([0, 60]).range([height, 0]);
 
-    // Add x axis to the bar chart
-    svg3
+    const data2 = [
+      { Species: "setosa", Amount: 50 },
+      { Species: "versicolor", Amount: 50 },
+      { Species: "virginica", Amount: 50 },
+    ];
+
+    // add bars
+    let bars = svg3
       .append("g")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(X_SCALE_3));
-
-    // Add y axis to the bar chart
-    svg3.append("g").call(d3.axisLeft(Y_SCALE_3));
-
-    // Add bars to the bar chart
-    svg3
-      .selectAll("rect")
-      .data(count_by_species)
+      .selectAll("bar")
+      .data(data2)
       .enter()
       .append("rect")
-      .attr("x", function (d) {
-        return X_SCALE_3(d.Species);
+      .attr("x", (d) => {
+        return X_SCALE3(d.Species) + margin.left;
       })
-      .attr("y", function (d) {
-        return Y_SCALE_3(d.count);
+      .attr("y", (d) => {
+        return Y_SCALE3(d.Amount) + margin.top;
       })
-      .attr("width", X_SCALE_3.bandwidth())
-      .attr("height", function (d) {
-        return height - Y_SCALE_3(d.count);
+      .attr("width", X_SCALE3.bandwidth())
+      .attr("height", (d) => {
+        return height - Y_SCALE3(d.Amount);
       })
-      .style("fill", function (d) {
-        return color(d.Species);
-      });
+      .attr("class", (d) => {
+        return d.Species + " bar";
+      })
+        .style("fill", function (d) {
+            return color(d.Species);
+            });
+
+    // Add an X axis to the vis
+    svg3
+      .append("g")
+      .attr(
+        "transform",
+        "translate(" + margin.left + "," + (height + margin.top) + ")"
+      )
+      .call(d3.axisBottom(X_SCALE3).ticks(10))
+
+    // Add a Y axis to the vis
+    svg3
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+      .call(d3.axisLeft(Y_SCALE3).ticks(10))
   });
 };
