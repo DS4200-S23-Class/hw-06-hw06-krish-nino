@@ -1,6 +1,6 @@
 window.onload = function () {
   // Set the dimensions of the canvas / graph
-  let margin = { top: 20, right: 20, bottom: 50, left: 70 },
+  let margin = { top: 20, right: 50, bottom: 50, left: 20 },
     width = 500 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom;
 
@@ -28,8 +28,6 @@ window.onload = function () {
 
   // Read the data from the CSV file
   d3.csv("data/iris.csv").then((data) => {
-    console.log(data);
-
     // Define scales for x and y axes
     let X_SCALE_1 = d3
       .scaleLinear()
@@ -57,7 +55,7 @@ window.onload = function () {
     svg.append("g").call(d3.axisLeft(Y_SCALE_1));
 
     // Add dots to the scatterplot
-    svg
+   let graph1 =  svg
       .selectAll("circle")
       .data(data)
       .enter()
@@ -75,12 +73,12 @@ window.onload = function () {
       .style("opacity", 0.5);
 
     // Define scales for x and y axes
-    let X_SCALE_2 = d3
+    const X_SCALE_2 = d3
       .scaleLinear()
       .domain([0, d3.max(data, (d) => parseInt(d.Sepal_Width) + 1)])
       .range([0, width]);
 
-    let Y_SCALE_2 = d3
+    const Y_SCALE_2 = d3
       .scaleLinear()
       .domain([0, d3.max(data, (d) => parseInt(d.Petal_Width) + 1)])
       .range([height, 0]);
@@ -95,7 +93,7 @@ window.onload = function () {
     svg2.append("g").call(d3.axisLeft(Y_SCALE_2));
 
     // Add dots to the scatterplot
-    svg2
+    let graph2 = svg2
       .selectAll("circle")
       .data(data)
       .enter()
@@ -112,7 +110,6 @@ window.onload = function () {
       })
       .style("opacity", 0.5);
 
-    // Add brush
     let brush = d3
       .brush()
       .extent([
@@ -121,30 +118,30 @@ window.onload = function () {
       ])
       .on("start brush", updateChart);
 
-    svg2.append("g").call(brush);
+    svg2.call(brush);
 
     // Function that is triggered when brushing is performed
     function updateChart(event) {
       extent = event.selection;
-      svg.classed("brushed", function (d) {
+      graph1.classed("selected", function (d) {
         return isBrushed(
           extent,
-          X_SCALE2(d.Sepal_Width) + margin.left,
-          Y_SCALE2(d.Petal_Width) + margin.top
+          X_SCALE_2(d.Sepal_Width),
+          Y_SCALE_2(d.Petal_Width)
         );
       });
-      svg2.classed("brushed", function (d) {
+      graph2.classed("selected", function (d) {
         return isBrushed(
           extent,
-          X_SCALE2(d.Sepal_Width) + margin.left,
-          Y_SCALE2(d.Petal_Width) + margin.top
+          X_SCALE_2(d.Sepal_Width),
+          Y_SCALE_2(d.Petal_Width)
         );
       });
-    bars.classed("selected", function (d) {
+      bar_graph.classed("bar_selected", function (d) {
         return isBrushed(
           extent,
-          X_SCALE2(d.Sepal_Width) + margin.left,
-          Y_SCALE2(d.Petal_Width) + margin.top
+          X_SCALE_2(d.Sepal_Width),
+          Y_SCALE_2(d.Petal_Width)
         );
       });
     }
@@ -179,28 +176,28 @@ window.onload = function () {
     ];
 
     // add bars
-    let bars = svg3
+    let bar_graph = svg3
       .append("g")
       .selectAll("bar")
-      .data(data2)
+      .data(data)
       .enter()
       .append("rect")
       .attr("x", (d) => {
         return X_SCALE3(d.Species) + margin.left;
       })
-      .attr("y", (d) => {
-        return Y_SCALE3(d.Amount) + margin.top;
-      })
+      .attr("y", function(d) { 
+        return Y_SCALE3(50) + margin.top; })
+
       .attr("width", X_SCALE3.bandwidth())
       .attr("height", (d) => {
-        return height - Y_SCALE3(d.Amount);
+        return height - Y_SCALE3(50);
       })
       .attr("class", (d) => {
         return d.Species + " bar";
       })
-        .style("fill", function (d) {
-            return color(d.Species);
-            });
+      .attr("fill", (d) => { return color(d.Species); })
+
+      svg3.selectAll("g").style("opacity", 0.5)
 
     // Add an X axis to the vis
     svg3

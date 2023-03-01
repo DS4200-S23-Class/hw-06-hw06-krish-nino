@@ -27,7 +27,14 @@ body {
 }
 
 .selected {
-	stroke: black;
-	stroke-width: 1px;
+	stroke: orange;
+	stroke-width: 3px;
 	opacity: 1 !important;
 }
+
+.bar_selected {
+	stroke: orange;
+	stroke-width: 5px;
+	opacity: 1 !important;
+}
+
